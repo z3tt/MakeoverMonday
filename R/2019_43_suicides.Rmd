@@ -117,6 +117,7 @@ timelines_born <-
   ggplot(aes(Year, suicides, fill = highlight)) +
     geom_area() +
     scale_x_continuous(expand = c(0, 0), 
+                       limits = c(1987, 2017),
                        breaks = seq(1990, 2010, by = 10),
                        labels = c("1990", "", "2010")) +
     scale_y_continuous(expand = c(0, 0),
@@ -155,7 +156,8 @@ timelines_age <-
     geom_area(fill = cols[1], color = cols[1], size = 0.1) +
     geom_area(aes(ifelse(Year >= min & Year <= max, Year, NA), suicides),
               fill = cols[3], color = cols[3], size = 0.3) +
-    scale_x_continuous(expand = c(0, 0), 
+    scale_x_continuous(expand = c(0, 0),
+                       limits = c(1987, 2017),
                        breaks = seq(1990, 2010, by = 10),
                        labels = c("1990", "", "2010")) +
     scale_y_continuous(expand = c(0, 0),
