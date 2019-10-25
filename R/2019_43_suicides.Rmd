@@ -1,0 +1,180 @@
+---
+title: "MakeoverMonday 2019/43 - Deaths by Suicide and Drug Poisoning"
+author: "Cedric Scherer"
+date: "16th of October 2019"
+output:
+  html_document:
+    theme: paper
+    highlight: kate
+editor_options:
+  chunk_output_type: console
+---
+
+```{r options, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
+```
+
+```{r setup}
+library(tidyverse)
+library(ggtext)
+library(emo)
+library(patchwork)
+
+source(here::here("theme", "tidy_grey.R"))
+
+theme_set(theme_custom(base_family = "Bitter"))
+
+theme_update(axis.ticks = element_line(size = 0.1, color = "grey40"),
+             axis.ticks.length.x = unit(7, "pt"), 
+             axis.ticks.length.y = unit(3, "pt"), 
+             axis.text = element_text(size = 11, family = "Roboto Mono", color = "grey60"),
+             axis.title.x = element_text(size = 13),
+             axis.title.y = element_text(size = 13, color = "grey60", vjust = 1),
+             plot.title = element_markdown(size = 22, color = "grey80", hjust = 0.5,
+                                           margin = margin(b = 20)),
+             plot.subtitle = element_text(size = 15, color = "grey60", 
+                                          lineheight = 1.2, hjust = 0.5),
+             plot.caption = element_text(size = 14, color = "grey80", 
+                                         lineheight = 1.3, hjust = 0.5),
+             plot.margin = margin(50, 80, 30, 50),
+             strip.background = element_rect(fill = NA, colour = NA), 
+             strip.text = element_text(colour = "grey70", size = 13),  
+             panel.border = element_rect(color = NA),
+             panel.spacing = unit(10, "pt"), 
+             panel.grid.major.y = element_line(size = 0.1, color = "grey40"))
+
+cols <- c("grey70", "#764786", "#764786")  ## #364bb7 #9900cd
+```
+
+```{r data}
+df_suicides <- read_csv("https://query.data.world/s/2uk7p5qdxocbm5gdof3dntomnt3x5d")
+
+df_suicides_grouped <-
+  df_suicides %>% 
+  mutate(
+    born = Year - Age,
+    born_group = glue::glue("{born %/% 10 * 10}-{born %/% 10 * 10+9}"),
+    age_group = glue::glue("{Age %/% 10 * 10}-{Age %/% 10 * 10+9}"),
+    decade = glue::glue("{Year %/% 10 * 10}s")
+  )
+```
+
+```{r dotplot-born}
+dotplot <-
+  df_suicides_grouped %>% 
+  group_by(born) %>% 
+  summarize(suicides_per_year = sum(Suicides) / n()) %>% 
+  group_by(born) %>% 
+  expand(count = seq(1:suicides_per_year)) %>% 
+  mutate(
+    count = count - 0.5,
+    highlight = if_else(born >= 1960 & born < 1970 , "1", "0")
+  ) %>% 
+  ggplot(aes(born, count, color = highlight)) +
+    geom_point(size = 0.9) +
+    annotate("text", x = 1920, y = 92, 
+             label = "Each dot represents one person in England or Wales\n that dies by suicide or drug poisoning per year.",
+             color = cols[1],
+             fontface = "bold",
+             family = "Bitter") +
+    annotate("text", x = 1990, y = 92, 
+             label = "People born in 1965 are the most frequent\nregistered age class with 111 deaths per year.",
+             color = cols[2],
+             family = "Bitter") +
+    scale_x_continuous(expand = c(0, 0),
+                       breaks = seq(1900, 2000, by = 10),
+                       limits = c(1891.5, 2007.5)) +
+    scale_y_continuous(expand = c(0.01, 0.01)) +
+    scale_color_manual(values = cols, 
+                       guide = F) +
+    labs(x = NULL, y = "Suicides per recorded year",
+         title = "People <span style='color:#764786'>born in the 60s</span> are most likely to die by suicide and drug poisoning.",
+         subtitle = "Deaths registered in England and Wales between 1981 and 2017 by year of birth (top)\nas well as over time splitted by decade born (center; not all shown) and age class (bottom).\n\n")
+```
+
+```{r timelines-born-groups}
+df_suicides_sum_born <-
+  df_suicides_grouped %>% 
+  # mutate(
+  #   born_group = case_when(
+  #     born < 1901 ~ "Lost generation",
+  #     born >= 1901 & born < 1928 ~ "Greatest generation",
+  #     born >= 1928 & born < 1946 ~ "Silent generation",
+  #     born >= 1946 & born < 1964 ~ "Baby boomers",
+  #     born >= 1965 & born < 1981 ~ "Generation X",
+  #     born >= 1981 & born < 1998 ~ "Millenials",
+  #     born >= 1998 ~ "Generation Z",
+  #   )
+  # ) %>% 
+  filter(born >= 1920, born < 2000) %>% 
+  group_by(born_group, Year) %>% 
+  summarize(suicides = sum(Suicides, na.rm = T))
+
+timelines_born <- 
+  df_suicides_sum_born %>% 
+  mutate(highlight = if_else(born_group == "1960-1969", "1", "0")) %>% 
+  ggplot(aes(Year, suicides, fill = highlight)) +
+    geom_area() +
+    scale_x_continuous(expand = c(0, 0), 
+                       breaks = seq(1990, 2010, by = 10),
+                       labels = c("1990", "", "2010")) +
+    scale_y_continuous(expand = c(0, 0),
+                       limits = c(0, 1350),
+                       breaks = seq(0, 1250, by = 250)) +
+    scale_fill_manual(values = c(cols[1], cols[3]), 
+                       guide = F) +
+    facet_wrap(~ born_group, nrow = 1, scales = "free_x") +
+    theme(plot.title = element_markdown(size = 20, 
+                                        color = cols[2],
+                                        lineheight = 2),
+          plot.subtitle = element_text(size = 15, 
+                                       color = "grey80",
+                                       lineheight = 1.1)) +
+    labs(x = NULL, y = "Number of suicides\n over time by decade born",
+         title = "<br>Content warning:",
+         subtitle = glue::glue('This visualization focusses on the sensitive topic of suicide.\nIf you or someone you know needs help, please contact Samaritans ({emo::ji("telephone_receiver")} 116 123 in the UK).\n\n\n\n\n\n'))
+```
+
+```{r timelines-age-groups}
+df_suicides_sum_age <-
+  df_suicides_grouped %>% 
+  group_by(age_group, Year) %>% 
+  summarize(suicides = sum(Suicides, na.rm = T))
+
+years <- 
+  df_suicides_grouped %>% 
+  filter(born_group == "1960-1969") %>%
+  group_by(age_group) %>% 
+  summarize(min = min(Year), max = max(Year))
+  
+timelines_age <- 
+  df_suicides_sum_age %>% 
+  left_join(years) %>% 
+  ggplot(aes(Year, suicides)) +
+    geom_area(fill = cols[1], color = cols[1], size = 0.1) +
+    geom_area(aes(ifelse(Year >= min & Year <= max, Year, NA), suicides),
+              fill = cols[3], color = cols[3], size = 0.3) +
+    scale_x_continuous(expand = c(0, 0), 
+                       breaks = seq(1990, 2010, by = 10),
+                       labels = c("1990", "", "2010")) +
+    scale_y_continuous(expand = c(0, 0),
+                       limits = c(0, 1350),
+                       breaks = seq(0, 1250, by = 250)) +
+    facet_wrap(~ age_group, nrow = 1) +
+    labs(x = NULL, y = "Number of suicides\n over time by age group",
+         title = NULL, subtitle = NULL,
+         caption = "\n\n\nVisualization by Cédric Scherer  •  Data: Office for National Statistics")
+```
+
+```{r full-panel, fig.width = 14, fig.height = 20}
+dotplot / timelines_born / timelines_age + plot_layout(heights = c(1, 0.4, 0.4))
+
+ggsave(here::here("plots", "2019_43_suicides.png"), 
+       width = 14, height = 21, dpi = 300)
+```
+
+***
+
+```{r session}
+sessionInfo()
+```
