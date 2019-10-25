@@ -89,8 +89,8 @@ dotplot <-
     scale_color_manual(values = cols, 
                        guide = F) +
     labs(x = NULL, y = "Suicides per recorded year",
-         title = "People <span style='color:#764786'>born in the 60s</span> are most likely to die by suicide and drug poisoning.",
-         subtitle = "Deaths registered in England and Wales between 1981 and 2017 by year of birth (top)\nas well as over time splitted by decade born (center; not all shown) and age class (bottom).\n\n")
+         title = "Most people dying die by suicide and drug poisoning were <span style='color:#764786'>born in the 60s</span>",
+         subtitle = "Deaths registered in England and Wales between 1981 and 2017 by year of birth (top)\nas well as over time splitted by decade born (middle, not all decades shown) and age class (bottom).\n\n")
 ```
 
 ```{r timelines-born-groups}
