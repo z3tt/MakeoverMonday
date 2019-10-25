@@ -4,7 +4,7 @@ Feedback is very welcome via [@CedScherer](https://twitter.com/cedscherer) or [c
 
 ***
 
-### Week 43/2019 ⁠😟 Deaths by Suicides and Drug Poisoning
+### Week 43/2019 ⁠😟 Deaths by Suicide and Drug Poisoning
 ![./plots/2019_43_suicide_deaths.png](https://github.com/Z3tt/MakeoverMonday/blob/master/plots/2019_43_suicide_deaths.png)
 
 ***
