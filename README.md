@@ -1,11 +1,16 @@
-# SWD Challenge
+# MakeoverMonday
 My contributions to the [#MakeoverMonday challenge](http://www.makeovermonday.co.uk/).  
 Feedback is very welcome via [@CedScherer](https://twitter.com/cedscherer) or [cedricphilippscherer@gmail.com](mailto:cedricphilippscherer@gmail.com).
 
 ***
 
+### Week 43/2019 ⁠😟 Deaths by Suicides and Drug Poisoning
+![./plots/2019_43_suicides.png](https://github.com/Z3tt/MakeoverMonday/blob/master/plots/2019_43_suicides.png)
+
+***
+
 ### Week 34/2019 ⁠📱📴 Smart Phone Use
-![./plots/2019-34_phone-use.png](https://github.com/Z3tt/MakeoverMonday/blob/master/plots/2019-34_phone-use.png)
+![./plots/2019_34_phone-use.png](https://github.com/Z3tt/MakeoverMonday/blob/master/plots/2019_34_phone-use.png)
 
 ***
 
