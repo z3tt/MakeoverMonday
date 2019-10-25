@@ -43,7 +43,8 @@ theme_update(axis.ticks = element_line(size = 0.1, color = "grey40"),
              panel.spacing = unit(10, "pt"), 
              panel.grid.major.y = element_line(size = 0.1, color = "grey40"))
 
-cols <- c("grey70", "#764786", "#764786")  ## #364bb7 #9900cd
+cols <- c("grey70", "#764786", "#764786")  #ä two different purples for dotplot + text and area plots
+## blue version: #364bb7
 ```
 
 ```{r data}
@@ -169,7 +170,7 @@ timelines_age <-
 ```{r full-panel, fig.width = 14, fig.height = 20}
 dotplot / timelines_born / timelines_age + plot_layout(heights = c(1, 0.4, 0.4))
 
-ggsave(here::here("plots", "2019_43_suicides.png"), 
+ggsave(here::here("plots", "2019_43_suicide_deaths.png"), 
        width = 14, height = 21, dpi = 300)
 ```
 
