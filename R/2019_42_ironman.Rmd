@@ -1,0 +1,288 @@
+---
+title: "MakeoverMonday 2019/34 - Smart Phone Use"
+author: "Cedric Scherer"
+date: "16th of October 2019"
+output:
+  html_document:
+    theme: paper
+    highlight: kate
+editor_options:
+  chunk_output_type: console
+---
+
+```{r options, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE)
+```
+
+```{r setup}
+library(httr)
+library(readxl)
+library(tidyverse)
+library(ggchicklet)
+library(ggtext)
+library(patchwork)
+
+source("./theme/tidy_grey.R")
+
+theme_update(rect = element_rect(fill = "grey10"),
+             axis.text = element_text(family = "Roboto Mono", 
+                                      color = "grey40", 
+                                      size = 6),
+             axis.ticks = element_blank(),
+             plot.subtitle = element_text(family = "Changa One", 
+                                          size = 35, 
+                                          color = "white"),
+             panel.border = element_rect(color = NA),
+             panel.grid.major.x = element_line(color = "grey20", 
+                                            size = 0.2,
+                                            linetype = "dotted"),
+             panel.grid.major.y = element_line(color = "grey20", 
+                                            size = 0.2,
+                                            linetype = "dotted"))
+
+cols <- c("#ebc600", "#cacaca", "#d59352")    ## gold, silver, bronze
+```
+
+```{r data}
+GET("https://query.data.world/s/qeg6rkcko5cx63pcuozmilgl33cmfd", 
+    write_disk(tf <- tempfile(fileext = ".xlsx")))
+
+df_iron <- read_excel(tf) %>% 
+  #filter(Year != "1982 (Feb)") %>% 
+  mutate(Year = case_when(
+    Year == "1982 (Feb)" ~ 1981.67, 
+    Year == "1982 (Oct)" ~ 1982.33, 
+    TRUE ~ as.numeric(Year))
+  ) %>% 
+  mutate(Place = factor(Place, levels = c("Gold", "Silver", "Bronze")))
+```
+
+```{r pyramid}
+df_iron_sum <- 
+  df_iron %>% 
+  group_by(Country, Place, Gender) %>% 
+  count() %>% 
+  group_by(Country) %>% 
+  mutate(
+    sum = sum(n),
+    n = if_else(Gender == "Male", -n, n)
+  ) %>% 
+  ungroup() %>% 
+  mutate(
+    Country = fct_reorder(Country, sum),
+    id = as.numeric(Country)
+  )
+
+names <-
+  df_iron_sum %>% 
+  dplyr::select(Country, sum) %>% 
+  distinct() %>% 
+  arrange(sum) %>% 
+  pull(Country)
+
+bars_male <- 
+  df_iron_sum %>% 
+  filter(Gender == "Male") %>% 
+  ggplot(aes(id, n, fill = Place)) +
+    geom_chicklet(position = "stack", 
+                  width = 0.7,
+                  size = 0.2,
+                  color = "grey10",
+                  radius = grid::unit(1.5, "pt")) + 
+    coord_flip() +
+    scale_x_continuous(limits = c(0.6, 16.4), 
+                       breaks = 1:16, 
+                       expand = c(0, 0)) +
+    scale_y_continuous(limits = c(-53, 0),
+                       breaks = seq(-50, 0, by = 10),
+                       labels = as.character(rev(seq(0, 50, by = 10))),
+                       expand = c(0, 0),
+                       position = "right") +
+    scale_fill_manual(values = cols, guide = F) +
+    theme(axis.text.x = element_text(color = "grey25"),
+          axis.text.y = element_blank(),
+          panel.grid.major.y = element_blank()) +
+    labs(x = NULL, y = NULL)
+
+bars_female <- 
+  df_iron_sum %>% 
+  filter(Gender == "Female") %>% 
+  ggplot(aes(id, n, fill = Place)) +
+    geom_chicklet(position = "stack", 
+                  width = 0.7,
+                  size = 0.2,
+                  color = "grey10",
+                  radius = grid::unit(1.5, "pt")) + 
+    coord_flip() +
+    scale_x_continuous(limits = c(0.6, 16.4), 
+                       breaks = 1:16, 
+                       expand = c(0, 0)) +
+    scale_y_continuous(limits = c(0, 53),
+                       breaks = seq(0, 50, by = 10),
+                       expand = c(0, 0),
+                       position = "right") +
+    scale_fill_manual(values = cols, name = "") +
+    theme(axis.text.x = element_text(color = "grey25"),
+          axis.text.y = element_blank(),
+          legend.position = c(0.78, 0.95),
+          legend.text = element_text(family = "Titillium Web",
+                                      size = 7,
+                                      color = "grey40"),
+          legend.background = element_rect(fill = "transparent",
+                                           color = "transparent"),
+          legend.key = element_rect(fill = "transparent", 
+                                    color = "transparent"), 
+          legend.key.width = unit(0.15, "in"),
+          legend.key.height = unit(0.2, "in"),
+          panel.grid.major.y = element_blank()) +
+    labs(x = NULL, y =  NULL)
+
+labs <- 
+  df_iron_sum %>% 
+  dplyr::select(Country, sum) %>% 
+  distinct() %>% 
+  arrange(sum) %>% 
+  mutate(rank = row_number()) %>% 
+  ggplot(aes(1, rank)) +
+    geom_text(aes(label = Country),
+              family = "Changa One",
+              color = "grey90",
+              #fontface = "bold",
+              size = 3.2) +
+    scale_y_continuous(limits = c(0.6, 16.4), 
+                       breaks = 1:16, 
+                       expand = c(0, 0)) +
+    theme(axis.ticks = element_blank(),
+          axis.text = element_blank(),
+          axis.title.x = element_text(family = "Titillium Web", 
+                                      face = "plain",
+                                      color = "grey80",
+                                      size = 7,
+                                      lineheight = 1.2),
+          plot.title = element_text(family = "Changa One", 
+                                    color = "grey90",
+                                    size = 52, 
+                                    face = "bold",
+                                    hjust = 0.5,
+                                    margin = margin(b = 0)),
+          plot.subtitle = element_text(family = "Titillium Web", 
+                                       face = "plain",
+                                       color = "grey90",
+                                       size = 10, 
+                                       hjust = 0.5,
+                                       margin = margin(b = 15)),
+          plot.caption = element_text(family = "Titillium Web", 
+                                      color = "grey50",
+                                      size = 7,
+                                      hjust = 0.5),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_blank(),
+          panel.background = element_rect(fill = "grey10")) +
+    labs(x = "\nThis year, history was made at the Ironman World Championships with German athletes winning both the men's and women's races for the first time. Germany has dominated the men's race in recent years, with the last six winners coming from the country and became the toughest adversary of the USA in terms of total medals won.\nThe Ironman World Championship has been held annually in Hawaii since 1978, with an additional race in 1982. The current Ironman Hawaii course record was set in 2019 by Jan Frodeno (Germany), whose winning time was 7 hrs 51 min 13 sec. The women's course record is 8 hrs 26 mins 18 sec, set in 2018 by Daniela Ryf (Switzerland).",
+         y = NULL,
+         title = "IRONMAN",
+         subtitle = glue::glue('{emo::ji("swimming_woman")}  2.4 miles        {emo::ji("biking_woman")}  112 miles        {emo::ji("running_woman")}  26.22 miles\n'),
+         caption = "\n\nVisualization by Cédric Scherer  •  Data: Wikipedia")
+  
+pyramid <- bars_male + labs + bars_female + plot_layout(widths = c(1, 0.11, 1))
+```
+
+```{r timeseries}
+df_iron_place <- 
+  df_iron %>% 
+  group_by(Country) %>% 
+  mutate(sum = n()) %>% 
+  ungroup() %>% 
+  mutate(
+    Country = fct_reorder(Country, sum),
+    id = as.numeric(Country),
+    position = case_when(
+      Place == "Gold" ~ 0.2,
+      Place == "Silver" ~ 0,
+      Place == "Bronze" ~ -0.2
+    ),
+    pos = id + position
+  )
+
+time_male <- 
+  df_iron_place %>% 
+  filter(Gender == "Male") %>% 
+  full_join(tibble(Country = names, id = 1:16)) %>% 
+  ggplot(aes(Year, pos, color = Place)) +
+    geom_segment(aes(y = id + 0.2, yend = id + 0.2,
+                     x = 1978, xend = 2019), 
+                 color = colorspace::darken(cols[1], 0.55),
+                 size = 0.25) +
+    geom_segment(aes(y = id, yend = id,
+                     x = 1978, xend = 2019), 
+                 color = colorspace::darken(cols[2], 0.55),
+                 size = 0.25) +
+    geom_segment(aes(y = id - 0.2, yend = id - 0.2,
+                     x = 1978, xend = 2019), 
+                 color = colorspace::darken(cols[3], 0.55),
+                 size = 0.25) +
+    geom_point(size = 0.9) +
+    scale_x_continuous(limits = c(1978, 2019),
+                       breaks = c(1978, seq(1990, 2010, by = 10), 2019),
+                       expand = c(0.01, 0.01),
+                       position = "top") + 
+    scale_y_continuous(limits = c(0.6, 16.4), 
+                       breaks = 1:16, 
+                       expand = c(0, 0),
+                       labels = names) +
+    scale_color_manual(values = cols, guide = F) +
+    theme(plot.subtitle = element_text(size = 28, hjust = 0),
+          axis.text.y = element_text(family = "Titillium Web", color = "grey25"),
+          axis.ticks = element_blank(),
+          panel.grid.major.y = element_blank()) +
+    labs(x = NULL, y = NULL,
+         subtitle = "MEN'S RACE")
+
+time_female <- 
+  df_iron_place %>% 
+  filter(Gender == "Female") %>% 
+  full_join(tibble(Country = names, id = 1:16)) %>% 
+  ggplot(aes(Year, pos, color = Place)) +
+    geom_segment(aes(y = id + 0.2, yend = id + 0.2,
+                     x = 1978, xend = 2019), 
+                 color = colorspace::darken(cols[1], 0.55),
+                 size = 0.25) +
+    geom_segment(aes(y = id, yend = id,
+                     x = 1978, xend = 2019), 
+                 color = colorspace::darken(cols[2], 0.55),
+                 size = 0.25) +
+    geom_segment(aes(y = id - 0.2, yend = id - 0.2,
+                     x = 1978, xend = 2019), 
+                 color = colorspace::darken(cols[3], 0.55),
+                 size = 0.25) +
+    geom_point(size = 0.9) +
+    scale_x_continuous(limits = c(1978, 2019),
+                       breaks = c(1978, seq(1990, 2010, by = 10), 2019),
+                       expand = c(0.01, 0.01),
+                       position = "top") + 
+    scale_y_continuous(limits = c(0.6, 16.4), 
+                       breaks = 1:16,
+                       expand = c(0, 0),
+                       labels = names,
+                       position = "right") +
+    scale_color_manual(values = cols, guide = F) +
+    theme(plot.subtitle = element_text(size = 28, hjust = 1),
+          axis.text.y = element_text(family = "Titillium Web", color = "grey25"),
+          axis.ticks = element_blank(),
+          panel.grid.major.y = element_blank()) +
+    labs(x = NULL, y = NULL,
+         subtitle = "WOMEN'S RACE")
+```
+
+```{r full-panel, fig.width = 14, fig.height = 6.8}
+time_male + pyramid + time_female + plot_layout(nrow = 1, widths = c(0.6, 1, 0.6))
+
+ggsave(here::here("plots", "2019_42_ironman.png"), 
+       width = 14, height = 7.2, dpi = 800)
+```
+
+***
+
+```{r session}
+sessionInfo()
+```
