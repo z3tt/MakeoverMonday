@@ -26,12 +26,9 @@ source("./theme/tidy_grey.R")
 
 theme_update(rect = element_rect(fill = "grey10"),
              axis.text = element_text(family = "Roboto Mono", 
-                                      color = "grey40", 
+                                      color = "grey55", 
                                       size = 6),
              axis.ticks = element_blank(),
-             plot.subtitle = element_text(family = "Changa One", 
-                                          size = 35, 
-                                          color = "white"),
              panel.border = element_rect(color = NA),
              panel.grid.major.x = element_line(color = "grey20", 
                                             size = 0.2,
@@ -40,7 +37,7 @@ theme_update(rect = element_rect(fill = "grey10"),
                                             size = 0.2,
                                             linetype = "dotted"))
 
-cols <- c("#ebc600", "#cacaca", "#d59352") #"#d4d4d4", "#cd7f32")    ## gold, silver, bronze
+cols <- c("#ebc600", "#cacaca", "#d59352") #"#d4d4d4", "#cd7f32")  ## gold, silver, bronze
 ```
 
 ```{r data}
@@ -100,8 +97,7 @@ bars_male <-
                        position = "right") +
     scale_color_manual(values = cols, guide = F) +
     scale_fill_manual(values = cols, guide = F) +
-    theme(axis.text.x = element_text(color = "grey25"),
-          axis.text.y = element_blank(),
+    theme(axis.text.y = element_blank(),
           panel.grid.major.y = element_blank()) +
     labs(x = NULL, y = NULL)
 
@@ -124,8 +120,7 @@ bars_female <-
                        position = "right") +
     scale_color_manual(values = cols, guide = F) +
     scale_fill_manual(values = cols, guide = F) +
-    theme(axis.text.x = element_text(color = "grey25"),
-          axis.text.y = element_blank(),
+    theme(axis.text.y = element_blank(),
           panel.grid.major.y = element_blank()) +
     labs(x = NULL, y =  NULL)
 
@@ -159,7 +154,7 @@ labs <-
                                        hjust = 0.5,
                                        margin = margin(b = 18)),
           plot.caption = element_text(family = "Titillium Web", 
-                                      color = "grey50",
+                                      color = "grey55",
                                       size = 7,
                                       hjust = 0.5),
           panel.grid.major.x = element_blank(),
@@ -217,8 +212,12 @@ time_male <-
                        expand = c(0, 0),
                        labels = names) +
     scale_color_manual(values = cols, guide = F) +
-    theme(plot.subtitle = element_text(hjust = 0),
-          axis.text.y = element_text(family = "Titillium Web", color = "grey25"),
+    theme(plot.subtitle = element_text(family = "Changa One", 
+                                       size = 28, 
+                                       hjust = 0),
+          axis.text.y = element_text(family = "Titillium Web", 
+                                     color = "grey25",
+                                     face = "bold"),
           axis.ticks = element_blank(),
           panel.grid.major.y = element_blank()) +
     labs(x = NULL, y = NULL,
@@ -252,8 +251,12 @@ time_female <-
                        labels = names,
                        position = "right") +
     scale_color_manual(values = cols, guide = F) +
-    theme(plot.subtitle = element_markdown(hjust = 1),
-          axis.text.y = element_text(family = "Titillium Web", color = "grey25"),
+    theme(plot.subtitle = element_markdown(family = "Changa One", 
+                                           size = 28, 
+                                           hjust = 1),
+          axis.text.y = element_text(family = "Titillium Web", 
+                                     color = "grey25",
+                                     face = "bold"),
           axis.ticks = element_blank(),
           panel.grid.major.y = element_blank()) +
     labs(x = NULL, y = NULL,
