@@ -6,16 +6,16 @@ Feedback is very welcome via [@CedScherer](https://twitter.com/cedscherer) or [c
 
 ### Week 43/2019 ⁠😟 Deaths by Suicide and Drug Poisoning
 
-![./plots/2019_43_suicide_deaths.png](https://github.com/Z3tt/MakeoverMonday/blob/master/plots/2019_43_suicide_deaths.png)
+![./plots/2019_43_suicide_deaths.png](https://raw.githubusercontent.com/Z3tt/MakeOverMonday/master/plots/2019_43_suicide_deaths.png)
 ***
 
 ### Week 42/2019 🏊🚴🏃 Ironman World Championship
-![./plots/2019_42_ironman.png](https://github.com/Z3tt/MakeoverMonday/blob/master/plots/2019_42_ironman.png)
+![./plots/2019_42_ironman.png](https://raw.githubusercontent.com/Z3tt/MakeOverMonday/master/plots/2019_42_ironman.png)
 
 ***
 
 ### Week 34/2019 ⁠📱📴 Smart Phone Use
-![./plots/2019_34_phone-use.png](https://github.com/Z3tt/MakeoverMonday/blob/master/plots/2019_34_phone-use.png)
+![./plots/2019_34_phone-use.png](https://raw.githubusercontent.com/Z3tt/MakeOverMonday/master/plots/2019_34_phone-use.png)
 
 ***
 
