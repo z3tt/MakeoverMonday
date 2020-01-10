@@ -74,7 +74,7 @@ bars <- ggplot(df, aes(question, percent, fill = group)) +
                              "... lose focus in class/work because\nthey are checking their cellphone")) +
   coord_flip() +
   labs(x = NULL, y = NULL,
-       caption = 'Source: "How Parents and Teens Navigate Screen Time and Device Distraction" by Pew Research Center  \nSurvey conducted March 7-April 10, 2018, with 1058 parents of teens and 743 teens (teens are between 13 and 17 years old)  \n\nVisualization by @CedScherer  ') +
+       caption = 'Source: "How Parents and Teens Navigate Screen Time and Device Distraction" by Pew Research Center  \nSurvey conducted March 7-April 10, 2018, with 1058 parents of teens and 743 teens (teens are between 13 and 17 years old)  \n\nVisualization by Cédric Scherer  ') +
   theme(rect = element_blank(),
         line = element_blank(),
         axis.text.x = element_blank(),
